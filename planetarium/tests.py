@@ -15,8 +15,8 @@ from planetarium.serializers import (AstronomyShowListSerializer,
                                      AstronomyShowDetailSerializer, AstronomyShowSerializer)
 
 
-ASTRONOMYSHOW_URL = reverse_lazy("planetarium:astronomy_shows-list")
-SHOW_SESSIONS_URL = reverse_lazy("planetarium:show_sessions-list")
+ASTRONOMYSHOW_URL = reverse_lazy("planetarium:astronomyshow-list")
+SHOW_SESSIONS_URL = reverse_lazy("planetarium:showsession-list")
 
 
 def sample_show(**params):
@@ -45,9 +45,9 @@ def sample_show_session(**params):
 
 
 def image_upload_url(astronomy_show_id):
-    """Return URL for recipe image upload"""
+    """Return URL for astronomy show image upload"""
     return reverse(
-        "planetarium:astronomyshow-upload-pimage", args=[astronomy_show_id]
+        "planetarium:astronomyshow-upload-image", args=[astronomy_show_id]
     )
 
 
@@ -107,11 +107,11 @@ class AuthenticatedAstronomyShowApiTests(TestCase):
 
         serializer1 = AstronomyShowListSerializer(astronomy_show1)
         serializer2 = AstronomyShowListSerializer(astronomy_show2)
-        serializer3 = AstronomyShowSerializer(astronomy_show3)
+        serializer3 = AstronomyShowListSerializer(astronomy_show3)
 
         self.assertIn(serializer1.data, res.data)
         self.assertIn(serializer2.data, res.data)
-        self.assertIn(serializer3.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
 
     def test_filter_astronomy_shows_by_title(self):
         astronomy_show1 = sample_show(title="Show")
@@ -125,11 +125,10 @@ class AuthenticatedAstronomyShowApiTests(TestCase):
 
         serializer1 = AstronomyShowListSerializer(astronomy_show1)
         serializer2 = AstronomyShowListSerializer(astronomy_show2)
-        serializer3 = AstronomyShowListSerializer(astronomy_show3)
-
+        # astronomy_show3 не должен попадать в результат
         self.assertIn(serializer1.data, res.data)
         self.assertIn(serializer2.data, res.data)
-        self.assertIn(serializer3.data, res.data)
+        self.assertNotIn(AstronomyShowListSerializer(astronomy_show3).data, res.data)
 
     def test_retrieve_astronomy_show_detail(self):
         astronomy_show = sample_show()
@@ -187,8 +186,8 @@ class AdminAstronomyShowApiTests(TestCase):
         astronomy_show = AstronomyShow.objects.get(id=res.data["id"])
         show_themes = astronomy_show.show_themes.all()
         self.assertEqual(show_themes.count(), 2)
-        self.assertEqual(show_theme1, show_themes)
-        self.assertEqual(show_theme2, show_themes)
+        self.assertIn(show_theme1, show_themes)
+        self.assertIn(show_theme2, show_themes)
 
 
 class AstronomyShowImageUploadTests(TestCase):
@@ -204,7 +203,8 @@ class AstronomyShowImageUploadTests(TestCase):
         )
 
     def tearDown(self):
-        self.astronomy_show.image.delete()
+        if self.astronomy_show.image:
+            self.astronomy_show.image.delete()
 
     def test_upload_image_to_astronomy_show(self):
         """Test uploading an image to astronomy show"""
