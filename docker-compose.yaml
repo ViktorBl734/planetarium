@@ -1,5 +1,5 @@
 services:
-  cinema_service:
+  planetarium_service:
     build:
       context: .
     env_file:
