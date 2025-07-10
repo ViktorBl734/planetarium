@@ -12,9 +12,13 @@ from rest_framework.viewsets import GenericViewSet
 
 from planetarium.models import ShowTheme, PlanetariumDome, AstronomyShow, ShowSession, Reservation
 from planetarium.permissions import IsAdminOrIfAuthenticatedReadOnly
-from planetarium.serializers import ShowThemeSerializer, PlanetariumDomeSerializer, AstronomyShowSerializer, \
-    AstronomyShowListSerializer, AstronomyShowDetailSerializer, AstronomyShowImageSerializer, ShowSessionSerializer, \
-    ShowSessionListSerializer, ShowSessionDetailSerializer, ReservationSerializer, ReservationListSerializer
+from planetarium.serializers import (ShowThemeSerializer, PlanetariumDomeSerializer,
+                                     AstronomyShowSerializer,
+                                     AstronomyShowListSerializer,
+                                     AstronomyShowDetailSerializer, AstronomyShowImageSerializer,
+                                     ShowSessionSerializer,
+                                     ShowSessionListSerializer, ShowSessionDetailSerializer,
+                                     ReservationSerializer, ReservationListSerializer)
 
 
 class ShowThemeViewSet(
